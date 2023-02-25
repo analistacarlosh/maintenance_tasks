@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { TaskModule } from './task/task.module';
+import { Task } from './task/entity/task.entity';
 
 @Module({
   imports: [
@@ -17,10 +19,11 @@ import { ConfigModule } from '@nestjs/config';
       username: process.env.TYPEORM_USERNAME,
       password: process.env.TYPEORM_PASSWORD,
       database: process.env.TYPEORM_DATABASE,
-      entities: ["entity/*.entity{.ts,.js}"],
+      entities: [Task],
       synchronize: false,
       logging: true,
     }),
+    TaskModule,
   ],
   controllers: [AppController],
   providers: [AppService],

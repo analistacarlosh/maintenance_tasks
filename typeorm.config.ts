@@ -12,7 +12,7 @@ export const cliOrmConfig: DataSourceOptions = {
   database: process.env.TYPEORM_DATABASE,
   synchronize: false,
   logging: true,
-  entities: ["./src/entity/*.entity{.ts,.js}"],
+  entities: ["./**/*/*.entity{.ts,.js}"],
   migrations: ["./src/migration/*-migration{.ts,.js}"]
 };
 
