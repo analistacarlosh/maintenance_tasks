@@ -35,6 +35,13 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Local environment
+
+```bash
+# docker run
+$ docker-compose up -d
+```
+
 ## License
 
 Nest is [MIT licensed](LICENSE).

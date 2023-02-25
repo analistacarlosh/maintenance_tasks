@@ -12,11 +12,13 @@ services:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     restart: always
+    env_file:
+     - ./.env
     ports:
       - 3307:3306
     environment:
-      MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: maintenance_tasks
+      MYSQL_ROOT_PASSWORD: "${TYPEORM_PASSWORD}"
+      MYSQL_DATABASE: "${TYPEORM_DATABASE}"
   adminer:
     image: adminer
     restart: always
