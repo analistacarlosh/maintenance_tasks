@@ -15,13 +15,29 @@ describe('TaskService', () => {
         {
           provide: repositoryToken,
           useValue: {
-            save: jest.fn()
+            save: jest
+              .fn()
               .mockImplementation((createTaskDto: CreateTaskDto) =>
-              Promise.resolve({ _id: '1', ...createTaskDto }),
-          ),
-            find: jest.fn(),
-          }
-        }
+                Promise.resolve({ _id: '1', ...createTaskDto }),
+              ),
+            find: jest.fn().mockImplementation(() =>
+              Promise.resolve([
+                {
+                  id: 1,
+                  title: 'Task #1',
+                  summary: 'description #1',
+                  created_at: new Date(),
+                },
+                {
+                  id: 2,
+                  title: 'Task #2',
+                  summary: 'description #2',
+                  created_at: new Date(),
+                },
+              ]),
+            ),
+          },
+        },
       ],
     }).compile();
 
@@ -33,15 +49,33 @@ describe('TaskService', () => {
   });
 
   describe('Task::create', () => {
-
     it('should create a task', async () => {
-      const task:CreateTaskDto = new CreateTaskDto();
+      const task: CreateTaskDto = new CreateTaskDto();
       task.title = 'title1';
       task.summary = 'summary1';
       const newTask: Task = await service.create(task);
       expect(newTask).toEqual({ _id: '1', ...task });
     });
-  
   });
 
+  describe('Task::find', () => {
+    it('should find a list of task', async () => {
+      const taskList = await service.findAll();
+
+      expect(taskList).toEqual([
+        {
+          id: 1,
+          title: 'Task #1',
+          summary: 'description #1',
+          created_at: new Date(),
+        },
+        {
+          id: 2,
+          title: 'Task #2',
+          summary: 'description #2',
+          created_at: new Date(),
+        },
+      ]);
+    });
+  });
 });
