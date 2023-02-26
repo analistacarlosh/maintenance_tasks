@@ -1,22 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { UserMockData } from '../utils/mockData/mockData';
 
-// TODO :: This should be a real class/interface representing a user entity
+// TODO :: This should be a real user entity connecting in the Database
 export type User = any;
 
 @Injectable()
 export class UserService {
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'carlos',
-      password: '123456',
-    },
-    {
-      userId: 2,
-      username: 'joao',
-      password: '654321',
-    },
-  ];
+  private readonly users = UserMockData;
 
   async findOne(username: string): Promise<User | undefined> {
     return this.users.find((user) => user.username === username);

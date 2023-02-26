@@ -42,6 +42,14 @@ $ npm run test:cov
 $ docker-compose up -d
 ```
 
+```bash
+# generate JWT secret key
+$ node
+$ crypto.randomBytes(64).toString("hex");
+```
+
+
+
 ## License
 
 Nest is [MIT licensed](LICENSE).

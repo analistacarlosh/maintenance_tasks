@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { TaskModule } from './task/task.module';
@@ -23,13 +21,11 @@ import { AuthModule } from './auth/auth.module';
       database: process.env.TYPEORM_DATABASE,
       entities: [Task],
       synchronize: false,
-      logging: true,
+      logging: false,
     }),
     TaskModule,
     UserModule,
     AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

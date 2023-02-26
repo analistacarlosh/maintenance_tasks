@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Request,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entity/task.entity';
@@ -10,12 +17,14 @@ import {
 } from '@nestjs/swagger';
 import { ConstantStrings } from '../utils/constants/strings.constants';
 import { SwaggerDocumentationHelper } from '../utils/helpers/swagger-documentation.helper';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth-guard';
 
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @ApiTags('task')
+  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiCreatedResponse({
     status: 201,
@@ -38,6 +47,7 @@ export class TaskController {
   }
 
   @ApiTags('task')
+  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiResponse({
     status: 200,
