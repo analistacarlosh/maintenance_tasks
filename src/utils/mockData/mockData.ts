@@ -1,14 +1,22 @@
+import { UserRole } from '../../user/userRole.enum';
+
 export const UserMockData = [
   {
     userId: 1,
-    username: 'carlos',
+    username: 'manager.test',
     password: '123456',
-    role: 'manager',
+    role: UserRole.manager,
   },
   {
     userId: 2,
-    username: 'joao',
+    username: 'technician.test1',
     password: '654321',
-    role: 'technician',
+    role: UserRole.technician,
+  },
+  {
+    userId: 2,
+    username: 'technician.test2',
+    password: '123456',
+    role: UserRole.technician,
   },
 ];

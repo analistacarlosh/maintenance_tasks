@@ -5,6 +5,7 @@ import { TaskModule } from './task/task.module';
 import { Task } from './task/entity/task.entity';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { User } from './user/entity/user.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.TYPEORM_USERNAME,
       password: process.env.TYPEORM_PASSWORD,
       database: process.env.TYPEORM_DATABASE,
-      entities: [Task],
+      entities: [Task, User],
       synchronize: false,
       logging: false,
     }),
