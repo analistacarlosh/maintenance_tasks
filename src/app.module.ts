@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { TaskModule } from './task/task.module';
 import { Task } from './task/entity/task.entity';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,11 +21,11 @@ import { Task } from './task/entity/task.entity';
       database: process.env.TYPEORM_DATABASE,
       entities: [Task],
       synchronize: false,
-      logging: true,
+      logging: false,
     }),
     TaskModule,
+    UserModule,
+    AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

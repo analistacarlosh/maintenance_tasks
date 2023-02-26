@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { BaseEntity } from '../../entity/base';
+import { BaseEntity } from '../../utils/entity/base';
 
 @Entity()
 export class Task extends BaseEntity {

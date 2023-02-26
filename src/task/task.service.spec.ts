@@ -9,6 +9,7 @@ describe('TaskService', () => {
   const repositoryToken = getRepositoryToken(Task);
 
   beforeEach(async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2023-01-01'));
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TaskService,
@@ -61,7 +62,6 @@ describe('TaskService', () => {
   describe('Task::find', () => {
     it('should find a list of task', async () => {
       const taskList = await service.findAll();
-
       expect(taskList).toEqual([
         {
           id: 1,
