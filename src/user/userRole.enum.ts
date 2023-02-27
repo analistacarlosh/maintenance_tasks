@@ -1,5 +1,4 @@
-
 export enum UserRole {
   manager = 'manager',
-  technician =  'technician'
+  technician = 'technician',
 }

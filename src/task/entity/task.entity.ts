@@ -14,5 +14,5 @@ export class Task extends BaseEntity {
   summary: string;
 
   @ManyToOne(() => User, (user) => user.tasks)
-  user: User
+  user: User;
 }

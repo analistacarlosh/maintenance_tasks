@@ -1,16 +1,21 @@
 import { Task } from '../../task/entity/task.entity';
-import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BaseEntity } from '../../utils/entity/base';
 import { UserRole } from '../userRole.enum';
 import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User extends BaseEntity {
-
   @BeforeInsert()
   async setPassword(password: string) {
-    const salt = await bcrypt.genSalt()
-    this.password = await bcrypt.hash(password || this.password, salt)
+    const salt = await bcrypt.genSalt();
+    this.password = await bcrypt.hash(password || this.password, salt);
   }
 
   @PrimaryGeneratedColumn()
@@ -25,7 +30,7 @@ export class User extends BaseEntity {
   @Column({
     type: 'enum',
     enum: ['manager', 'technician'],
-    default: "technician"
+    default: 'technician',
   })
   role: UserRole;
 
