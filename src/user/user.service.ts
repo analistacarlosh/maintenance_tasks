@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { UserMockData } from '../utils/mockData/mockData';
-
-// TODO :: This should be a real user entity connecting in the Database
-export type User = any;
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entity/user.entity';
 
 @Injectable()
 export class UserService {
-  private readonly users = UserMockData;
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
 
   async findOne(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+    return this.userRepository.findOneBy({ username: username });
   }
 }

@@ -33,15 +33,12 @@ describe('TaskController', () => {
         ],
       })
       .compile();
-
-    jest.useFakeTimers().setSystemTime(new Date('2023-01-01'));
-
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
 
-  it(`/POST Authentication`, async () => {
+  it(`Post :: /auth/login - Authentication`, async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
@@ -53,8 +50,16 @@ describe('TaskController', () => {
     token = response.body.access_token;
   });
 
-  describe('/POST', () => {
-    it(`/POST should return 201 as has all the required fields`, async () => {
+  describe('Post :: /task', () => {
+    it(`should return 401 as it is not authenticated`, async () => {
+      return request(app.getHttpServer())
+        .post('/task')
+        .send(taskMock)
+        .expect(401)
+        .expect('Content-Type', /json/);
+    });
+
+    it(`should return 201 as has all the required fields`, async () => {
       return request(app.getHttpServer())
         .post('/task')
         .send(taskMock)
@@ -64,7 +69,7 @@ describe('TaskController', () => {
         .expect({ data: taskMock });
     });
 
-    it(`/POST should return 400 as doesnt have the required fields`, () => {
+    it(`should return 400 as doesnt have the required fields`, () => {
       return request(app.getHttpServer())
         .post('/task')
         .set('Authorization', 'Bearer ' + token)
@@ -72,19 +77,19 @@ describe('TaskController', () => {
     });
   });
 
-  describe('/GET All', () => {
-    it(`/GET should return 200 and a list of task`, async () => {
+  describe('Get :: /task', () => {
+    it(`should return 401 as it is not authenticated`, () => {
+      return request(app.getHttpServer())
+        .get('/task')
+        .expect(401)
+        .expect('Content-Type', /json/);
+    });
+
+    it(`should return 200 and a list of task`, async () => {
       return request(app.getHttpServer())
         .get('/task')
         .set('Authorization', 'Bearer ' + token)
         .expect(200)
-        .expect('Content-Type', /json/);
-    });
-
-    it(`/GET should return 401 as it is not authenticated`, () => {
-      return request(app.getHttpServer())
-        .get('/task')
-        .expect(401)
         .expect('Content-Type', /json/);
     });
   });
