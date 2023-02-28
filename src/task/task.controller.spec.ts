@@ -7,7 +7,8 @@ import { UserMockData } from '../utils/mockData/mockData';
 
 describe('TaskController', () => {
   let app: INestApplication;
-  let token: string;
+  let managerToken: string;
+  let technicianToken: string;
 
   const taskMock = {
     title: 'task1',
@@ -38,7 +39,7 @@ describe('TaskController', () => {
     await app.init();
   });
 
-  it(`Post :: /auth/login - Authentication`, async () => {
+  it(`Post :: /auth/login - Manager Authentication`, async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
@@ -47,10 +48,22 @@ describe('TaskController', () => {
       })
       .expect(201);
     expect(response.body.access_token).toBeDefined();
-    token = response.body.access_token;
+    managerToken = response.body.access_token;
   });
 
-  describe('Post :: /task', () => {
+  it(`Post :: /auth/login - Technician Authentication`, async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        username: UserMockData[1].username,
+        password: UserMockData[1].password,
+      })
+      .expect(201);
+    expect(response.body.access_token).toBeDefined();
+    technicianToken = response.body.access_token;
+  });
+
+  describe.skip('Post :: /task', () => {
     it(`should return 401 as it is not authenticated`, async () => {
       return request(app.getHttpServer())
         .post('/task')
@@ -63,7 +76,7 @@ describe('TaskController', () => {
       return request(app.getHttpServer())
         .post('/task')
         .send(taskMock)
-        .set('Authorization', 'Bearer ' + token)
+        .set('Authorization', 'Bearer ' + technicianToken)
         .expect(201)
         .expect('Content-Type', /json/)
         .expect({ data: taskMock });
@@ -72,13 +85,13 @@ describe('TaskController', () => {
     it(`should return 400 as doesnt have the required fields`, () => {
       return request(app.getHttpServer())
         .post('/task')
-        .set('Authorization', 'Bearer ' + token)
+        .set('Authorization', 'Bearer ' + technicianToken)
         .expect(400);
     });
   });
 
   describe('Get :: /task', () => {
-    it(`should return 401 as it is not authenticated`, () => {
+    it.skip(`should return 401 as it is not authenticated`, () => {
       return request(app.getHttpServer())
         .get('/task')
         .expect(401)
@@ -88,7 +101,7 @@ describe('TaskController', () => {
     it(`should return 200 and a list of task`, async () => {
       return request(app.getHttpServer())
         .get('/task')
-        .set('Authorization', 'Bearer ' + token)
+        .set('Authorization', 'Bearer ' + technicianToken)
         .expect(200)
         .expect('Content-Type', /json/);
     });

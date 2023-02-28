@@ -51,7 +51,7 @@ describe('TaskService', () => {
       }
 
       const userId = UserMockData[0].id;
-      // Add a mock on userService.findOneById
+      // TODO :: Add a mock on userService.findOneById
       const creatorUser: User = await userService.findOneById(userId);
       expect(creatorUser.id).toBeDefined();
       expect(TaskDtoMockData.title).toBeDefined();
@@ -64,7 +64,7 @@ describe('TaskService', () => {
     });
   });
 
-  describe.skip('Task::find', () => {
+  describe('Task::find', () => {
     it('should find a list of task', async () => {
       if (process.env.MOCKED_TEST) {
         const findMock = jest.spyOn(repo, 'find');
@@ -72,6 +72,22 @@ describe('TaskService', () => {
       }
 
       const taskList: Task[] = await service.findAll();
+      expect(taskList.length).toBeTruthy();
+      expect(taskList[0].title).toBeDefined();
+      expect(taskList[0].summary).toBeDefined();
+      expect(taskList[0].id).toBeDefined();
+    });
+  });
+
+  describe('Task::findByUserId', () => {
+    it('should find a list of task by an valid user id', async () => {
+      if (process.env.MOCKED_TEST) {
+        const findMock = jest.spyOn(repo, 'find');
+        findMock.mockImplementation(() => Promise.resolve(TaskLisMockData));
+      }
+
+      const userId = UserMockData[0].id;
+      const taskList: Task[] = await service.findByUserId(userId);
       expect(taskList.length).toBeTruthy();
       expect(taskList[0].title).toBeDefined();
       expect(taskList[0].summary).toBeDefined();

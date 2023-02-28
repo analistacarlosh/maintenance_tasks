@@ -21,6 +21,7 @@ import { SwaggerDocumentationHelper } from '../utils/helpers/swagger-documentati
 import { JwtAuthGuard } from '../auth/guard/jwt-auth-guard';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entity/user.entity';
+import { UserRole } from '../user/userRole.enum';
 
 @Controller('task')
 export class TaskController {
@@ -76,8 +77,15 @@ export class TaskController {
     status: 500,
     description: ConstantStrings.swaggerDescription500Response,
   })
-  async findAll() {
-    const taskList: Task[] = await this.taskService.findAll();
+  async findAll(@Request() request) {
+    const { role, userId } = request.user;
+
+    if (role === UserRole.manager) {
+      const taskList: Task[] = await this.taskService.findAll();
+      return { data: taskList };
+    }
+
+    const taskList: Task[] = await this.taskService.findByUserId(userId);
     return { data: taskList };
   }
 }
