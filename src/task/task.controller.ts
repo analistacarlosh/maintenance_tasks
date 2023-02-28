@@ -42,7 +42,7 @@ export class TaskController {
     description: ConstantStrings.swaggerDescription500Response,
   })
   async create(@Body() createTaskDto: CreateTaskDto) {
-    const newTask: Task = await this.taskService.create(createTaskDto);
+    const newTask: Task = await this.taskService.save(createTaskDto);
     return { data: newTask };
   }
 

@@ -20,7 +20,7 @@ describe('TaskController', () => {
     })
       .overrideProvider(TaskService)
       .useValue({
-        create: () => taskMock,
+        save: () => taskMock,
         findAll: () => [
           {
             id: 1,
