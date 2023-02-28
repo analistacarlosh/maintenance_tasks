@@ -5,37 +5,49 @@ import { UserRole } from '../../user/userRole.enum';
 
 export const UserMockData = [
   {
-    userId: 1,
+    id: 10,
     username: 'manager.test',
     password: '123456',
     role: UserRole.manager,
+    active: true,
+    createdAt: new Date(2003, 1, 1),
+    updatedAt: new Date(2003, 1, 1),
+    deletedAt: null,
   },
   {
-    userId: 2,
+    id: 11,
     username: 'technician.test1',
     password: '654321',
     role: UserRole.technician,
+    active: true,
+    createdAt: new Date(2003, 1, 1),
+    updatedAt: new Date(2003, 1, 1),
+    deletedAt: null,
   },
   {
-    userId: 2,
+    id: 12,
     username: 'technician.test2',
     password: '123456',
     role: UserRole.technician,
+    active: true,
+    createdAt: new Date(2003, 1, 1),
+    updatedAt: new Date(2003, 1, 1),
+    deletedAt: null,
   },
 ];
 
 const task: Task = {
   id: 1,
-  title: 'title333',
-  summary: 'summary1133',
-  createdAt: new Date(),
-  updatedAt: new Date,
+  title: 'titleMocked',
+  summary: 'summarMocked',
+  createdAt: new Date(2003, 1, 1),
+  updatedAt: new Date(2003, 1, 1),
   deletedAt: null,
   user: new User(),
 };
 
-export const TaskLisMockData: Task[] = [ task ];
+export const TaskLisMockData: Task[] = [task];
 
 export const TaskDtoMockData: CreateTaskDto = new CreateTaskDto();
-task.title = `${new Date()} - title`;
-task.summary = `${new Date()} - summary`;
+TaskDtoMockData.title = `${new Date()} - titleMocked`;
+TaskDtoMockData.summary = `${new Date()} - summaryMocked`;
