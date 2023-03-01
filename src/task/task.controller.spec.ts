@@ -32,6 +32,16 @@ describe('TaskController', () => {
             deletedAt: null,
           },
         ],
+        findByUserId: () => [
+          {
+            id: 1,
+            title: 'Task #1',
+            summary: 'description #1',
+            createdAt: '2023-01-01T00:00:00.000Z',
+            updatedAt: null,
+            deletedAt: null,
+          },
+        ],
       })
       .compile();
     app = moduleRef.createNestApplication();
