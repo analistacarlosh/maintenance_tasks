@@ -48,8 +48,6 @@ $ node
 $ crypto.randomBytes(64).toString("hex");
 ```
 
-
-
 ## License
 
 Nest is [MIT licensed](LICENSE).
