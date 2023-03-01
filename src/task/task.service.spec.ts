@@ -1,81 +1,105 @@
+import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { CreateTaskDto } from './dto/create-task.dto';
+import { AppModule } from '../app.module';
 import { Task } from './entity/task.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { TaskModule } from './task.module';
 import { TaskService } from './task.service';
+import { Repository } from 'typeorm';
+import {
+  TaskDtoMockData,
+  TaskLisMockData,
+  UserMockData,
+} from '../utils/mockData/mockData';
+import { UserService } from '../user/user.service';
+import { User } from '../user/entity/user.entity';
 
 describe('TaskService', () => {
   let service: TaskService;
-  const repositoryToken = getRepositoryToken(Task);
+  let userService: UserService;
+  let app: INestApplication;
+  let repo: Repository<Task>;
 
-  beforeEach(async () => {
-    jest.useFakeTimers().setSystemTime(new Date('2023-01-01'));
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        TaskService,
-        {
-          provide: repositoryToken,
-          useValue: {
-            save: jest
-              .fn()
-              .mockImplementation((createTaskDto: CreateTaskDto) =>
-                Promise.resolve({ _id: '1', ...createTaskDto }),
-              ),
-            find: jest.fn().mockImplementation(() =>
-              Promise.resolve([
-                {
-                  id: 1,
-                  title: 'Task #1',
-                  summary: 'description #1',
-                  created_at: new Date(),
-                },
-                {
-                  id: 2,
-                  title: 'Task #2',
-                  summary: 'description #2',
-                  created_at: new Date(),
-                },
-              ]),
-            ),
-          },
-        },
-      ],
+      providers: [TaskService],
+      imports: [AppModule, TaskModule],
     }).compile();
 
     service = module.get<TaskService>(TaskService);
+    userService = module.get<UserService>(UserService);
+
+    repo = module.get<Repository<Task>>(getRepositoryToken(Task));
+    app = module.createNestApplication();
+    await app.init();
   });
 
   it('service should be defined', () => {
     expect(service).toBeDefined();
+    expect(userService).toBeDefined();
+    expect(repo).toBeDefined();
+    expect(app).toBeDefined();
   });
 
-  describe('Task::create', () => {
+  describe('Task::save', () => {
     it('should create a task', async () => {
-      const task: CreateTaskDto = new CreateTaskDto();
-      task.title = 'title1';
-      task.summary = 'summary1';
-      const newTask: Task = await service.create(task);
-      expect(newTask).toEqual({ _id: '1', ...task });
+      if (process.env.MOCKED_TEST) {
+        const saveMock = jest.spyOn(repo, 'save');
+        saveMock.mockImplementation((newTask: Task) =>
+          Promise.resolve({ ...newTask, ...TaskDtoMockData, ...UserMockData }),
+        );
+      }
+
+      const userId = UserMockData[0].id;
+      // TODO :: Add a mock on userService.findOneById
+      const creatorUser: User = await userService.findOneById(userId);
+      expect(creatorUser.id).toBeDefined();
+      expect(TaskDtoMockData.title).toBeDefined();
+      expect(TaskDtoMockData.summary).toBeDefined();
+
+      const savedTask: Task = await service.save(TaskDtoMockData, creatorUser);
+      expect(savedTask.title).toEqual(TaskDtoMockData.title);
+      expect(savedTask.summary).toEqual(TaskDtoMockData.summary);
+      expect(savedTask.user.id).toBeDefined();
     });
   });
 
   describe('Task::find', () => {
     it('should find a list of task', async () => {
-      const taskList = await service.findAll();
-      expect(taskList).toEqual([
-        {
-          id: 1,
-          title: 'Task #1',
-          summary: 'description #1',
-          created_at: new Date(),
-        },
-        {
-          id: 2,
-          title: 'Task #2',
-          summary: 'description #2',
-          created_at: new Date(),
-        },
-      ]);
+      if (process.env.MOCKED_TEST) {
+        const findMock = jest.spyOn(repo, 'find');
+        findMock.mockImplementation(() => Promise.resolve(TaskLisMockData));
+      }
+
+      const taskList: Task[] = await service.findAll();
+      expect(taskList.length).toBeTruthy();
+      expect(taskList[0].title).toBeDefined();
+      expect(taskList[0].summary).toBeDefined();
+      expect(taskList[0].id).toBeDefined();
     });
+  });
+
+  describe('Task::findByUserId', () => {
+    it('should find a list of task by an valid user id', async () => {
+      if (process.env.MOCKED_TEST) {
+        const findMock = jest.spyOn(repo, 'find');
+        findMock.mockImplementation(() => Promise.resolve(TaskLisMockData));
+      }
+
+      const userId = UserMockData[0].id;
+      const taskList: Task[] = await service.findByUserId(userId);
+      expect(taskList.length).toBeTruthy();
+      expect(taskList[0].title).toBeDefined();
+      expect(taskList[0].summary).toBeDefined();
+      expect(taskList[0].id).toBeDefined();
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });

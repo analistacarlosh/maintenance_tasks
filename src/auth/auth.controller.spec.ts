@@ -7,7 +7,7 @@ import { UserMockData } from '../utils/mockData/mockData';
 describe('AuthController', () => {
   let app: INestApplication;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -21,25 +21,27 @@ describe('AuthController', () => {
     expect(app).toBeDefined();
   });
 
-  it('should get a login sucefully passing correct credentials', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        username: UserMockData[0].username,
-        password: UserMockData[0].password,
-      })
-      .expect(201);
-    expect(response.body.access_token).toBeDefined();
-  });
+  describe('Post :: /auth/login', () => {
+    it('Should get a login sucefully passing correct credentials', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: UserMockData[0].username,
+          password: UserMockData[0].password,
+        })
+        .expect(201);
+      expect(response.body.access_token).toBeDefined();
+    });
 
-  it('should not make a login with a wrong credentials', async () => {
-    await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        username: UserMockData[0].username,
-        password: 'wrong-password',
-      })
-      .expect(401);
+    it('Should not make a login with a wrong credentials', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          username: UserMockData[0].username,
+          password: 'wrong-password',
+        })
+        .expect(401);
+    });
   });
 
   afterAll(async () => {

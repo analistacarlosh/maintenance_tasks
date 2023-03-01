@@ -5,6 +5,7 @@ import {
   Post,
   Body,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -18,10 +19,16 @@ import {
 import { ConstantStrings } from '../utils/constants/strings.constants';
 import { SwaggerDocumentationHelper } from '../utils/helpers/swagger-documentation.helper';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth-guard';
+import { UserService } from '../user/user.service';
+import { User } from '../user/entity/user.entity';
+import { UserRole } from '../user/userRole.enum';
 
 @Controller('task')
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(
+    private taskService: TaskService,
+    private userService: UserService,
+  ) {}
 
   @ApiTags('task')
   @UseGuards(JwtAuthGuard)
@@ -41,8 +48,18 @@ export class TaskController {
     status: 500,
     description: ConstantStrings.swaggerDescription500Response,
   })
-  async create(@Body() createTaskDto: CreateTaskDto) {
-    const newTask: Task = await this.taskService.create(createTaskDto);
+  async create(@Body() createTaskDto: CreateTaskDto, @Request() request) {
+    const { userId } = request.user;
+
+    const creatorUser: User = await this.userService.findOneById(userId);
+    if (creatorUser === undefined) {
+      throw new BadRequestException('User details not found.');
+    }
+
+    const newTask: Task = await this.taskService.save(
+      createTaskDto,
+      creatorUser,
+    );
     return { data: newTask };
   }
 
@@ -60,8 +77,15 @@ export class TaskController {
     status: 500,
     description: ConstantStrings.swaggerDescription500Response,
   })
-  async findAll() {
-    const taskList: Task[] = await this.taskService.findAll();
+  async findAll(@Request() request) {
+    const { role, userId } = request.user;
+
+    if (role === UserRole.manager) {
+      const taskList: Task[] = await this.taskService.findAll();
+      return { data: taskList };
+    }
+
+    const taskList: Task[] = await this.taskService.findByUserId(userId);
     return { data: taskList };
   }
 }

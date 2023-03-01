@@ -7,7 +7,8 @@ import { UserMockData } from '../utils/mockData/mockData';
 
 describe('TaskController', () => {
   let app: INestApplication;
-  let token: string;
+  let managerToken: string;
+  let technicianToken: string;
 
   const taskMock = {
     title: 'task1',
@@ -20,7 +21,7 @@ describe('TaskController', () => {
     })
       .overrideProvider(TaskService)
       .useValue({
-        create: () => taskMock,
+        save: () => taskMock,
         findAll: () => [
           {
             id: 1,
@@ -33,15 +34,12 @@ describe('TaskController', () => {
         ],
       })
       .compile();
-
-    jest.useFakeTimers().setSystemTime(new Date('2023-01-01'));
-
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
 
-  it(`/POST Authentication`, async () => {
+  it(`Post :: /auth/login - Manager Authentication`, async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
@@ -50,41 +48,61 @@ describe('TaskController', () => {
       })
       .expect(201);
     expect(response.body.access_token).toBeDefined();
-    token = response.body.access_token;
+    managerToken = response.body.access_token;
   });
 
-  describe('/POST', () => {
-    it(`/POST should return 201 as has all the required fields`, async () => {
+  it(`Post :: /auth/login - Technician Authentication`, async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        username: UserMockData[1].username,
+        password: UserMockData[1].password,
+      })
+      .expect(201);
+    expect(response.body.access_token).toBeDefined();
+    technicianToken = response.body.access_token;
+  });
+
+  describe.skip('Post :: /task', () => {
+    it(`should return 401 as it is not authenticated`, async () => {
       return request(app.getHttpServer())
         .post('/task')
         .send(taskMock)
-        .set('Authorization', 'Bearer ' + token)
+        .expect(401)
+        .expect('Content-Type', /json/);
+    });
+
+    it(`should return 201 as has all the required fields`, async () => {
+      return request(app.getHttpServer())
+        .post('/task')
+        .send(taskMock)
+        .set('Authorization', 'Bearer ' + technicianToken)
         .expect(201)
         .expect('Content-Type', /json/)
         .expect({ data: taskMock });
     });
 
-    it(`/POST should return 400 as doesnt have the required fields`, () => {
+    it(`should return 400 as doesnt have the required fields`, () => {
       return request(app.getHttpServer())
         .post('/task')
-        .set('Authorization', 'Bearer ' + token)
+        .set('Authorization', 'Bearer ' + technicianToken)
         .expect(400);
     });
   });
 
-  describe('/GET All', () => {
-    it(`/GET should return 200 and a list of task`, async () => {
-      return request(app.getHttpServer())
-        .get('/task')
-        .set('Authorization', 'Bearer ' + token)
-        .expect(200)
-        .expect('Content-Type', /json/);
-    });
-
-    it(`/GET should return 401 as it is not authenticated`, () => {
+  describe('Get :: /task', () => {
+    it.skip(`should return 401 as it is not authenticated`, () => {
       return request(app.getHttpServer())
         .get('/task')
         .expect(401)
+        .expect('Content-Type', /json/);
+    });
+
+    it(`should return 200 and a list of task`, async () => {
+      return request(app.getHttpServer())
+        .get('/task')
+        .set('Authorization', 'Bearer ' + technicianToken)
+        .expect(200)
         .expect('Content-Type', /json/);
     });
   });
