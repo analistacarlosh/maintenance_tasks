@@ -46,7 +46,6 @@ export class TaskService {
   }
 
   async newTaskPerformedNotification(message: string) {
-    console.log(`newTaskPerformedNotification :: ${message}`);
-    return this.client.send({ cmd: 'newTaskPerformed' }, message);
+    this.client.emit('new-task-performed-notification', message);
   }
 }

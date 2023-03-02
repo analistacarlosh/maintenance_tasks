@@ -1,11 +1,10 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { EventPattern } from '@nestjs/microservices';
 
 @Controller('user')
 export class UserController {
-  @MessagePattern({ cmd: 'newTaskPerformed' })
-  getNewTaskPerformed(message: string): string {
-    console.log(`getNewTaskPerformed :: ${message}`);
-    return message;
+  @EventPattern('new-task-performed-notification')
+  async handleNewTaskPerformed(data: Record<string, unknown>) {
+    console.log('new-task-performed-notification', data);
   }
 }

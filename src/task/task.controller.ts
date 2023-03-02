@@ -49,11 +49,10 @@ export class TaskController {
     description: ConstantStrings.swaggerDescription500Response,
   })
   async create(@Body() createTaskDto: CreateTaskDto, @Request() request) {
-    const { userId, role } = request.user;
+    const { userId, role, username } = request.user;
 
     const creatorUser: User = await this.userService.findOneById(userId);
     if (creatorUser === undefined) {
-      // TODO :: move it to an external constant string file
       throw new BadRequestException('User details not found.');
     }
 
@@ -63,12 +62,12 @@ export class TaskController {
     );
 
     if (role === UserRole.technician) {
-      const notificationMessage = 'The tech X performed the task Y on date Z';
-      console.log('send:: The tech X performed the task Y on date Z');
+      const notificationMessage = `The tech: ${username} performed the task ${
+        createTaskDto.summary
+      } on date: ${new Date()}.`;
       this.taskService.newTaskPerformedNotification(notificationMessage);
     }
 
-    console.log('::before reutrn newTask');
     return { data: newTask };
   }
 
@@ -100,6 +99,8 @@ export class TaskController {
 
   @Get('/taskCreatedNotification')
   async newTaskPerformedNotification() {
-    return this.taskService.newTaskPerformedNotification('test');
+    const notificationMessage = 'The tech X performed the task Y on date Z';
+    console.log('send:: The tech X performed the task Y on date Z');
+    this.taskService.newTaskPerformedNotification(notificationMessage);
   }
 }
