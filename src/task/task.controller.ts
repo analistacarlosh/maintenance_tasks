@@ -62,9 +62,10 @@ export class TaskController {
     );
 
     if (role === UserRole.technician) {
-      const notificationMessage = `The tech: ${username} performed the task ${
-        createTaskDto.summary
-      } on date: ${new Date()}.`;
+      const notificationMessage = `The tech: ${username}
+      performed the task ${createTaskDto.summary}
+      on date: ${new Date()}.`;
+
       this.taskService.newTaskPerformedNotification(notificationMessage);
     }
 
@@ -97,6 +98,7 @@ export class TaskController {
     return { data: taskList };
   }
 
+  // TODO :: delete it
   @Get('/taskCreatedNotification')
   async newTaskPerformedNotification() {
     const notificationMessage = 'The tech X performed the task Y on date Z';

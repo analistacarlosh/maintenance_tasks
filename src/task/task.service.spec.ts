@@ -7,8 +7,8 @@ import { TaskModule } from './task.module';
 import { TaskService } from './task.service';
 import { Repository } from 'typeorm';
 import {
+  ManagementTaskLisMockData,
   TaskDtoMockData,
-  TaskLisMockData,
   UserMockData,
 } from '../utils/mockData/mockData';
 import { UserService } from '../user/user.service';
@@ -68,7 +68,9 @@ describe('TaskService', () => {
     it('should find a list of task', async () => {
       if (process.env.MOCKED_TEST) {
         const findMock = jest.spyOn(repo, 'find');
-        findMock.mockImplementation(() => Promise.resolve(TaskLisMockData));
+        findMock.mockImplementation(() =>
+          Promise.resolve(ManagementTaskLisMockData),
+        );
       }
 
       const taskList: Task[] = await service.findAll();
@@ -83,7 +85,9 @@ describe('TaskService', () => {
     it('should find a list of task by an valid user id', async () => {
       if (process.env.MOCKED_TEST) {
         const findMock = jest.spyOn(repo, 'find');
-        findMock.mockImplementation(() => Promise.resolve(TaskLisMockData));
+        findMock.mockImplementation(() =>
+          Promise.resolve(ManagementTaskLisMockData),
+        );
       }
 
       const userId = UserMockData[0].id;
