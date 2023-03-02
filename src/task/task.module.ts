@@ -6,18 +6,23 @@ import { Task } from './entity/task.entity';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entity/user.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forFeature([Task, User]),
     ClientsModule.register([
       {
         name: 'TASK_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost:5672'],
+          urls: [process.env.RABBITMQ_HOST],
           queue: 'task_updated_queue',
-          queueOptions: { durable: false, noAck: false },
+          queueOptions: { durable: false },
         },
       },
     ]),

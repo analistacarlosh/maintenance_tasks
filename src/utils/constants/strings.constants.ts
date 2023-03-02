@@ -6,4 +6,11 @@ export class ConstantStrings {
   static swaggerDescription500Response = 'Internal Server Error.';
   static swaggerTaskDescription200Response = 'Returns a list of all tasks';
   //#endregion
+
+  //#region Task
+  static taskControllerFindOneByidError = 'User details not found';
+  static taskControllerSaveError = 'Error to save a new task';
+  static taskControllerFindAllError = 'Error to find all tasks.';
+  static taskControllerFindByUserIdError = 'Error to find task by user.';
+  //#endregion
 }

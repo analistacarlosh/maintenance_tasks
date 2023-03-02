@@ -51,7 +51,6 @@ describe('TaskService', () => {
       }
 
       const userId = UserMockData[0].id;
-      // TODO :: Add a mock on userService.findOneById
       const creatorUser: User = await userService.findOneById(userId);
       expect(creatorUser.id).toBeDefined();
       expect(TaskDtoMockData.title).toBeDefined();

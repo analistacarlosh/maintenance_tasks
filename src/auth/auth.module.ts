@@ -7,9 +7,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './strategy/jwt-auth.strategy';
 import { AuthController } from './auth.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../user/entity/user.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([User]),
     ConfigModule.forRoot({
       envFilePath: '.env',
     }),

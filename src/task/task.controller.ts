@@ -54,14 +54,16 @@ export class TaskController {
     const creatorUser: User = await this.userService.findOneById(userId);
     if (creatorUser === undefined) {
       // TODO: log this error as an custom exception Sentry
-      throw new BadRequestException('User details not found.');
+      throw new BadRequestException(
+        ConstantStrings.taskControllerFindOneByidError,
+      );
     }
 
     const newTask: Task = await this.taskService
       .save(createTaskDto, creatorUser)
       .catch((_error: unknown) => {
         // TODO: log this error as an custom exception Sentry
-        throw new BadRequestException('Error to save a new task.');
+        throw new BadRequestException(ConstantStrings.taskControllerSaveError);
       });
 
     if (role === UserRole.technician) {
@@ -97,7 +99,9 @@ export class TaskController {
         .findAll()
         .catch((_error: unknown) => {
           // TODO :: log this error as an custom exception Sentry
-          throw new BadRequestException('Error to find all tasks.');
+          throw new BadRequestException(
+            ConstantStrings.taskControllerFindAllError,
+          );
         });
       return { data: taskList };
     }
@@ -106,9 +110,19 @@ export class TaskController {
       .findByUserId(userId)
       .catch((_error: unknown) => {
         // TODO :: log this error as an custom exception Sentry
-        throw new BadRequestException('Error to find task by user.');
+        throw new BadRequestException(
+          ConstantStrings.taskControllerFindByUserIdError,
+        );
       });
 
     return { data: taskList };
+  }
+
+  @ApiTags('notification')
+  @Get('notification')
+  async notification(@Request() request) {
+    this.taskService.newTaskPerformedNotification(
+      'test :: newTaskPerformedNotification',
+    );
   }
 }
