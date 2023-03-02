@@ -1,6 +1,14 @@
 # compiled output
 /dist
 /node_modules
+/log/rabbitmq/data/*
+/log/rabbitmq/log/*
+
+# exception to the rule
+!/log/rabbitmq/data/.gitkeep
+!/log/rabbitmq/log/.gitkeep
+
+.env
 
 # Logs
 logs
