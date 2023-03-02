@@ -11,7 +11,7 @@ export const cliOrmConfig: DataSourceOptions = {
   password: process.env.TYPEORM_PASSWORD,
   database: process.env.TYPEORM_DATABASE,
   synchronize: false,
-  logging: true,
+  logging: false,
   entities: ["./**/*/*.entity{.ts,.js}"],
   migrations: ["./src/migration/*-migration{.ts,.js}"]
 };
