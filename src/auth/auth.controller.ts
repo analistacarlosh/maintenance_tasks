@@ -1,4 +1,10 @@
-import { Controller, Request, Post, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Request,
+  Post,
+  UseGuards,
+  BadRequestException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthGuard } from './guard/login-auth.guard';
 
@@ -9,6 +15,8 @@ export class AuthController {
   @UseGuards(LoginAuthGuard)
   @Post('auth/login')
   async login(@Request() req) {
-    return this.authService.login(req.user);
+    return this.authService.login(req.user).catch((_error: unknown) => {
+      throw new BadRequestException('Error to complete the login.');
+    });
   }
 }

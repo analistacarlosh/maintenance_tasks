@@ -5,7 +5,9 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { AppModule } from '../app.module';
 import {
   ManagementTaskLisMockData,
+  ManagementTaskMockData,
   TechnicianTaskLisMockData,
+  TechnicianTaskMockData,
   UserMockData,
 } from '../utils/mockData/mockData';
 
@@ -23,35 +25,9 @@ describe('TaskController', () => {
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      // .overrideProvider(TaskService)
-      // .useValue({
-      //   save: () => taskMock,
-      //   findAll: () => [
-      //     {
-      //       id: 1,
-      //       title: 'Task #1',
-      //       summary: 'description #1',
-      //       createdAt: '2023-01-01T00:00:00.000Z',
-      //       updatedAt: null,
-      //       deletedAt: null,
-      //     },
-      //   ],
-      //   findByUserId: () => [
-      //     {
-      //       id: 1,
-      //       title: 'Task #1',
-      //       summary: 'description #1',
-      //       createdAt: '2023-01-01T00:00:00.000Z',
-      //       updatedAt: null,
-      //       deletedAt: null,
-      //     },
-      //   ],
-      // })
-      .compile();
+    }).compile();
 
     taskService = moduleRef.get<TaskService>(TaskService);
-
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
@@ -81,30 +57,105 @@ describe('TaskController', () => {
     technicianToken = response.body.access_token;
   });
 
-  describe.skip('Post :: /task - create a task as a technician user', () => {
-    it(`should return 401 as it is not authenticated`, async () => {
-      await request(app.getHttpServer())
-        .post('/task')
-        .send(taskMock)
-        .expect(401)
-        .expect('Content-Type', /json/);
+  describe('Post :: /task', () => {
+    describe('Post :: /task - create a task as a technician user', () => {
+      it(`should return 401 as it is not authenticated`, async () => {
+        await request(app.getHttpServer())
+          .post('/task')
+          .send(taskMock)
+          .expect(401)
+          .expect('Content-Type', /json/);
+      });
+
+      it(`should return 400 as doesnt have the required fields`, async () => {
+        await request(app.getHttpServer())
+          .post('/task')
+          .set('Authorization', `Bearer ${technicianToken}`)
+          .expect(400);
+      });
+
+      it(`should return 201 as a technician with all the required fields
+      and send the notification to manager`, async () => {
+        const saveMock = jest.spyOn(taskService, 'save');
+        saveMock.mockImplementation(() =>
+          Promise.resolve(TechnicianTaskMockData),
+        );
+
+        const newTaskPerformedNotificationMock = jest.spyOn(
+          taskService,
+          'newTaskPerformedNotification',
+        );
+        newTaskPerformedNotificationMock.mockImplementation(() =>
+          Promise.resolve(),
+        );
+
+        await request(app.getHttpServer())
+          .post('/task')
+          .send(taskMock)
+          .set('Authorization', `Bearer ${technicianToken}`)
+          .expect(201)
+          .expect('Content-Type', /json/)
+          .then((response) => {
+            expect(response.body.data.title).toBe(TechnicianTaskMockData.title);
+            expect(response.body.data.summary).toBe(
+              TechnicianTaskMockData.summary,
+            );
+            expect(response.body.data.id).toBe(TechnicianTaskMockData.id);
+          });
+
+        expect(saveMock).toHaveBeenCalledTimes(1);
+        expect(newTaskPerformedNotificationMock).toHaveBeenCalledTimes(1);
+      });
     });
 
-    it(`should return 201 as has all the required fields`, async () => {
-      await request(app.getHttpServer())
-        .post('/task')
-        .send(taskMock)
-        .set('Authorization', `Bearer ${technicianToken}`)
-        .expect(201)
-        .expect('Content-Type', /json/);
-      // .expect({ data: taskMock });
-    });
+    describe('Post :: /task - create a task as a manager user', () => {
+      it(`should return 401 as it is not authenticated`, async () => {
+        await request(app.getHttpServer())
+          .post('/task')
+          .send(taskMock)
+          .expect(401)
+          .expect('Content-Type', /json/);
+      });
 
-    it(`should return 400 as doesnt have the required fields`, async () => {
-      await request(app.getHttpServer())
-        .post('/task')
-        .set('Authorization', `Bearer ${technicianToken}`)
-        .expect(400);
+      it(`should return 400 as doesnt have the required fields`, async () => {
+        await request(app.getHttpServer())
+          .post('/task')
+          .set('Authorization', `Bearer ${technicianToken}`)
+          .expect(400);
+      });
+
+      it(`should return 201 as a manager with all the required fields
+      and not send the notification`, async () => {
+        const saveMock = jest.spyOn(taskService, 'save');
+        saveMock.mockImplementation(() =>
+          Promise.resolve(ManagementTaskMockData),
+        );
+
+        const newTaskPerformedNotificationMock = jest.spyOn(
+          taskService,
+          'newTaskPerformedNotification',
+        );
+        newTaskPerformedNotificationMock.mockImplementation(() =>
+          Promise.resolve(),
+        );
+
+        await request(app.getHttpServer())
+          .post('/task')
+          .send(taskMock)
+          .set('Authorization', `Bearer ${managerToken}`)
+          .expect(201)
+          .expect('Content-Type', /json/)
+          .then((response) => {
+            expect(response.body.data.title).toBe(ManagementTaskMockData.title);
+            expect(response.body.data.summary).toBe(
+              ManagementTaskMockData.summary,
+            );
+            expect(response.body.data.id).toBe(ManagementTaskMockData.id);
+          });
+
+        expect(saveMock).toHaveBeenCalledTimes(1);
+        expect(newTaskPerformedNotificationMock).toHaveBeenCalledTimes(0);
+      });
     });
   });
 

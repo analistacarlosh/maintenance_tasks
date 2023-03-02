@@ -45,7 +45,7 @@ export class TaskService {
     });
   }
 
-  async newTaskPerformedNotification(message: string) {
+  async newTaskPerformedNotification(message: string): Promise<void> {
     this.client.emit('new-task-performed-notification', message);
   }
 }

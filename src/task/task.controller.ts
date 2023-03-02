@@ -53,18 +53,21 @@ export class TaskController {
 
     const creatorUser: User = await this.userService.findOneById(userId);
     if (creatorUser === undefined) {
+      // TODO: log this error as an custom exception Sentry
       throw new BadRequestException('User details not found.');
     }
 
-    const newTask: Task = await this.taskService.save(
-      createTaskDto,
-      creatorUser,
-    );
+    const newTask: Task = await this.taskService
+      .save(createTaskDto, creatorUser)
+      .catch((_error: unknown) => {
+        // TODO: log this error as an custom exception Sentry
+        throw new BadRequestException('Error to save a new task.');
+      });
 
     if (role === UserRole.technician) {
       const notificationMessage = `The tech: ${username}
       performed the task ${createTaskDto.summary}
-      on date: ${new Date()}.`;
+      on date: ${newTask.createdAt}.`;
 
       this.taskService.newTaskPerformedNotification(notificationMessage);
     }
@@ -90,19 +93,22 @@ export class TaskController {
     const { role, userId } = request.user;
 
     if (role === UserRole.manager) {
-      const taskList: Task[] = await this.taskService.findAll();
+      const taskList: Task[] = await this.taskService
+        .findAll()
+        .catch((_error: unknown) => {
+          // TODO :: log this error as an custom exception Sentry
+          throw new BadRequestException('Error to find all tasks.');
+        });
       return { data: taskList };
     }
 
-    const taskList: Task[] = await this.taskService.findByUserId(userId);
-    return { data: taskList };
-  }
+    const taskList: Task[] = await this.taskService
+      .findByUserId(userId)
+      .catch((_error: unknown) => {
+        // TODO :: log this error as an custom exception Sentry
+        throw new BadRequestException('Error to find task by user.');
+      });
 
-  // TODO :: delete it
-  @Get('/taskCreatedNotification')
-  async newTaskPerformedNotification() {
-    const notificationMessage = 'The tech X performed the task Y on date Z';
-    console.log('send:: The tech X performed the task Y on date Z');
-    this.taskService.newTaskPerformedNotification(notificationMessage);
+    return { data: taskList };
   }
 }

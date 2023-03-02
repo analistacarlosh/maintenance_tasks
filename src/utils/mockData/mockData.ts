@@ -40,7 +40,7 @@ export const UserMockData = [
   },
 ];
 
-const managementTask: Task = {
+export const ManagementTaskMockData: Task = {
   id: 1,
   title: 'management Task',
   summary: 'management Task summary',
@@ -50,7 +50,7 @@ const managementTask: Task = {
   user: new User(),
 };
 
-const technicianTask: Task = {
+export const TechnicianTaskMockData: Task = {
   id: 1,
   title: 'management Task',
   summary: 'management Task summary',
@@ -61,14 +61,14 @@ const technicianTask: Task = {
 };
 
 export const ManagementTaskLisMockData: Task[] = [
-  managementTask,
-  managementTask,
+  ManagementTaskMockData,
+  ManagementTaskMockData,
 ];
 
 export const TechnicianTaskLisMockData: Task[] = [
-  technicianTask,
-  technicianTask,
-  technicianTask,
+  TechnicianTaskMockData,
+  TechnicianTaskMockData,
+  TechnicianTaskMockData,
 ];
 
 export const TaskDtoMockData: CreateTaskDto = new CreateTaskDto();
