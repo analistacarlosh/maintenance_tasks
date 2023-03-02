@@ -11,17 +11,17 @@ import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entity/task.entity';
 import {
-  ApiCreatedResponse,
+  ApiBearerAuth,
+  ApiOkResponse,
   ApiResponse,
   ApiTags,
-  getSchemaPath,
 } from '@nestjs/swagger';
 import { ConstantStrings } from '../utils/constants/strings.constants';
-import { SwaggerDocumentationHelper } from '../utils/helpers/swagger-documentation.helper';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth-guard';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entity/user.entity';
 import { UserRole } from '../user/userRole.enum';
+import { TaskResponseDto } from './dto/task-response.dto';
 
 @Controller('task')
 export class TaskController {
@@ -33,15 +33,18 @@ export class TaskController {
   @ApiTags('task')
   @UseGuards(JwtAuthGuard)
   @Post()
-  @ApiCreatedResponse({
-    status: 201,
+  @ApiBearerAuth('JWT')
+  @ApiOkResponse({
     description: ConstantStrings.swaggerDescription201Response,
-    schema: SwaggerDocumentationHelper.OkResponseObjectSchema(
-      getSchemaPath(CreateTaskDto),
-    ),
+    type: TaskResponseDto,
+    isArray: false,
   })
   @ApiResponse({
     status: 400,
+    description: ConstantStrings.swaggerDescription400BadRequest,
+  })
+  @ApiResponse({
+    status: 401,
     description: ConstantStrings.swaggerDescription400BadRequest,
   })
   @ApiResponse({
@@ -80,12 +83,15 @@ export class TaskController {
   @ApiTags('task')
   @UseGuards(JwtAuthGuard)
   @Get()
-  @ApiResponse({
-    status: 200,
+  @ApiBearerAuth('JWT')
+  @ApiOkResponse({
     description: ConstantStrings.swaggerTaskDescription200Response,
-    schema: SwaggerDocumentationHelper.OkResponseObjectArraySchema(
-      getSchemaPath(CreateTaskDto),
-    ),
+    type: TaskResponseDto,
+    isArray: true,
+  })
+  @ApiResponse({
+    status: 401,
+    description: ConstantStrings.swaggerDescription400BadRequest,
   })
   @ApiResponse({
     status: 500,
@@ -103,7 +109,7 @@ export class TaskController {
             ConstantStrings.taskControllerFindAllError,
           );
         });
-      return { data: taskList };
+      return { data: taskList, length: taskList.length };
     }
 
     const taskList: Task[] = await this.taskService
@@ -115,14 +121,6 @@ export class TaskController {
         );
       });
 
-    return { data: taskList };
-  }
-
-  @ApiTags('notification')
-  @Get('notification')
-  async notification(@Request() request) {
-    this.taskService.newTaskPerformedNotification(
-      'test :: newTaskPerformedNotification',
-    );
+    return { data: taskList, length: taskList.length };
   }
 }

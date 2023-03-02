@@ -26,6 +26,9 @@ export class TaskService {
 
   async findAll(): Promise<Task[]> {
     return await this.taskRepository.find({
+      relations: {
+        user: true,
+      },
       order: {
         createdAt: 'DESC',
       },
@@ -38,6 +41,9 @@ export class TaskService {
         user: {
           id: userId,
         },
+      },
+      relations: {
+        user: true,
       },
       order: {
         createdAt: 'DESC',
