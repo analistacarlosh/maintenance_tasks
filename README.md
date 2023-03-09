@@ -21,6 +21,15 @@ $ crypto.randomBytes(64).toString("hex");
 $ docker-compose up -d
 ```
 
+```bash
+# troubles to get any service up and running because of port conflict
+$ ps -aux | grep ${PORT}
+$ sudo kill <PID>
+# run again
+$ docker-compose up -d
+```
+
+
 ## Database migration
 In the docker-compose I have defined to run the migration together with npm install and start, but the migration command is not working.
 So, before you start to test the API, you can access the mysql by adminer http://localhost:8080/ (credials are in the .env.example) and
