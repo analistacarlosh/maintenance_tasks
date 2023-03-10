@@ -29,11 +29,10 @@ $ sudo kill <PID>
 $ docker-compose up -d
 ```
 
-
-## Database migration
-In the docker-compose I have defined to run the migration together with npm install and start, but the migration command is not working.
-So, before you start to test the API, you can access the mysql by adminer http://localhost:8080/ (credials are in the .env.example) and
-import the migration database from the folder /database/migration_db.sql
+### Run database migration
+```bash
+$ docker-compose exec api npm run typeorm:migration:run
+```
 
 ## Test mocked users
 - To facilitate the test in the migration process the user,
@@ -54,12 +53,9 @@ password: 123456
 - Do the authenticaion first
 - copy and paste the token in the Authorize button to use the other two endpoints.
 
-
 ## To run the node Api locally, not in the Docker container
-- Consider to change the port and host to
-
+- Consider to change the phost to
 TYPEORM_HOST=localhost
-TYPEORM_PORT=3307
 RABBITMQ_HOST=amqp://localhost:5672
 
 ```bash

@@ -2,7 +2,7 @@ version: "3"
 services:
   api:
     image: node:18-alpine
-    command: sh -c "npm install && npm run start:dev && npm run typeorm:migration:run"
+    command: sh -c "npm install && npm run start:dev"
     ports:
       - ${API_PORT}:${API_PORT}
     depends_on:
