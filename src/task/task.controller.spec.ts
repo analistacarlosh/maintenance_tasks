@@ -8,18 +8,33 @@ import {
   ManagementTaskMockData,
   TechnicianTaskLisMockData,
   TechnicianTaskMockData,
-  UserMockData,
+  TechnicianUserMockData,
+  ManagerUserMockData,
 } from '../utils/mockData/mockData';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth-guard';
 
 describe('TaskController', () => {
   let app: INestApplication;
   let managerToken: string;
   let technicianToken: string;
   let taskService: TaskService;
+  let jwtAuthGuard: JwtAuthGuard;
 
   const taskMock = {
     title: 'task1',
     summary: 'easy task',
+  };
+
+  const technicianUserRequestMockData = {
+    userId: TechnicianUserMockData.id,
+    username: TechnicianUserMockData.username,
+    role: TechnicianUserMockData.role,
+  };
+
+  const managerUserRequestMockData = {
+    userId: ManagerUserMockData.id,
+    username: ManagerUserMockData.username,
+    role: ManagerUserMockData.role,
   };
 
   beforeAll(async () => {
@@ -28,33 +43,11 @@ describe('TaskController', () => {
     }).compile();
 
     taskService = moduleRef.get<TaskService>(TaskService);
+    jwtAuthGuard = moduleRef.get<JwtAuthGuard>(JwtAuthGuard);
+
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
-  });
-
-  it(`Post :: /auth/login - Manager Authentication`, async () => {
-    const response = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        username: UserMockData[0].username,
-        password: UserMockData[0].password,
-      })
-      .expect(201);
-    expect(response.body.access_token).toBeDefined();
-    managerToken = response.body.access_token;
-  });
-
-  it(`Post :: /auth/login - Technician Authentication`, async () => {
-    const response = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        username: UserMockData[1].username,
-        password: UserMockData[1].password,
-      })
-      .expect(201);
-    expect(response.body.access_token).toBeDefined();
-    technicianToken = response.body.access_token;
   });
 
   describe('Post :: /task', () => {
@@ -68,14 +61,24 @@ describe('TaskController', () => {
       });
 
       it(`should return 400 as doesnt have the required fields`, async () => {
+        const handleRequestMock = jest
+          .spyOn(jwtAuthGuard, 'handleRequest')
+          .mockImplementation(() => technicianUserRequestMockData);
+
         await request(app.getHttpServer())
           .post('/task')
           .set('Authorization', `Bearer ${technicianToken}`)
           .expect(400);
+
+        expect(handleRequestMock).toHaveBeenCalledTimes(1);
       });
 
       it(`should return 201 as a technician with all the required fields
       and send the notification to manager`, async () => {
+        const handleRequestMock = jest
+          .spyOn(jwtAuthGuard, 'handleRequest')
+          .mockImplementation(() => technicianUserRequestMockData);
+
         const saveMock = jest.spyOn(taskService, 'save');
         saveMock.mockImplementation(() =>
           Promise.resolve(TechnicianTaskMockData),
@@ -103,6 +106,7 @@ describe('TaskController', () => {
             expect(response.body.data.id).toBe(TechnicianTaskMockData.id);
           });
 
+        expect(handleRequestMock).toHaveBeenCalledTimes(1);
         expect(saveMock).toHaveBeenCalledTimes(1);
         expect(newTaskPerformedNotificationMock).toHaveBeenCalledTimes(1);
       });
@@ -118,14 +122,24 @@ describe('TaskController', () => {
       });
 
       it(`should return 400 as doesnt have the required fields`, async () => {
+        const handleRequestMock = jest
+          .spyOn(jwtAuthGuard, 'handleRequest')
+          .mockImplementation(() => managerUserRequestMockData);
+
         await request(app.getHttpServer())
           .post('/task')
           .set('Authorization', `Bearer ${technicianToken}`)
           .expect(400);
+
+        expect(handleRequestMock).toHaveBeenCalledTimes(1);
       });
 
       it(`should return 201 as a manager with all the required fields
       and not send the notification`, async () => {
+        const handleRequestMock = jest
+          .spyOn(jwtAuthGuard, 'handleRequest')
+          .mockImplementation(() => managerUserRequestMockData);
+
         const saveMock = jest.spyOn(taskService, 'save');
         saveMock.mockImplementation(() =>
           Promise.resolve(ManagementTaskMockData),
@@ -153,6 +167,7 @@ describe('TaskController', () => {
             expect(response.body.data.id).toBe(ManagementTaskMockData.id);
           });
 
+        expect(handleRequestMock).toHaveBeenCalledTimes(1);
         expect(saveMock).toHaveBeenCalledTimes(1);
         expect(newTaskPerformedNotificationMock).toHaveBeenCalledTimes(0);
       });
@@ -169,6 +184,10 @@ describe('TaskController', () => {
       });
 
       it(`should return 200 and a list of task from findByUserId`, async () => {
+        const handleRequestMock = jest
+          .spyOn(jwtAuthGuard, 'handleRequest')
+          .mockImplementation(() => technicianUserRequestMockData);
+
         const findByUserIdMock = jest.spyOn(taskService, 'findByUserId');
         findByUserIdMock.mockImplementation(() =>
           Promise.resolve(TechnicianTaskLisMockData),
@@ -188,6 +207,7 @@ describe('TaskController', () => {
             expect(response.body.data.length).toBe(3);
           });
 
+        expect(handleRequestMock).toHaveBeenCalledTimes(1);
         expect(findByUserIdMock).toHaveBeenCalledTimes(1);
         expect(findAllMock).toHaveBeenCalledTimes(0);
       });
@@ -202,6 +222,10 @@ describe('TaskController', () => {
       });
 
       it(`should return 200 and a list of task from findAll`, async () => {
+        const handleRequestMock = jest
+          .spyOn(jwtAuthGuard, 'handleRequest')
+          .mockImplementation(() => managerUserRequestMockData);
+
         const findAllMock = jest.spyOn(taskService, 'findAll');
         findAllMock.mockImplementation(() =>
           Promise.resolve(ManagementTaskLisMockData),
@@ -221,6 +245,7 @@ describe('TaskController', () => {
             expect(response.body.data.length).toBe(2);
           });
 
+        expect(handleRequestMock).toHaveBeenCalledTimes(1);
         expect(findAllMock).toHaveBeenCalledTimes(1);
         expect(findByUserIdMock).toHaveBeenCalledTimes(0);
       });
