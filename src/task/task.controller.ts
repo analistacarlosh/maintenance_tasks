@@ -23,7 +23,7 @@ import { User } from '../user/entity/user.entity';
 import { UserRole } from '../user/userRole.enum';
 import { TaskResponseDto } from './dto/task-response.dto';
 
-@Controller('task')
+@Controller()
 export class TaskController {
   constructor(
     private taskService: TaskService,
@@ -32,7 +32,7 @@ export class TaskController {
 
   @ApiTags('task')
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('v1/task')
   @ApiBearerAuth('JWT')
   @ApiOkResponse({
     description: ConstantStrings.swaggerDescription201Response,
@@ -56,7 +56,7 @@ export class TaskController {
 
     const creatorUser: User = await this.userService.findOneById(userId);
     if (creatorUser === undefined) {
-      // TODO: log this error as an custom exception Sentry
+      // TODO: log this error as an custom Sentry exception
       throw new BadRequestException(
         ConstantStrings.taskControllerFindOneByidError,
       );
@@ -65,7 +65,7 @@ export class TaskController {
     const newTask: Task = await this.taskService
       .save(createTaskDto, creatorUser)
       .catch((_error: unknown) => {
-        // TODO: log this error as an custom exception Sentry
+        // TODO: log this error as an custom Sentry exception
         throw new BadRequestException(ConstantStrings.taskControllerSaveError);
       });
 
@@ -82,7 +82,7 @@ export class TaskController {
 
   @ApiTags('task')
   @UseGuards(JwtAuthGuard)
-  @Get()
+  @Get('v1/task')
   @ApiBearerAuth('JWT')
   @ApiOkResponse({
     description: ConstantStrings.swaggerTaskDescription200Response,
@@ -104,7 +104,7 @@ export class TaskController {
       const taskList: Task[] = await this.taskService
         .findAll()
         .catch((_error: unknown) => {
-          // TODO :: log this error as an custom exception Sentry
+          // TODO :: log this error as an custom Sentry exception
           throw new BadRequestException(
             ConstantStrings.taskControllerFindAllError,
           );

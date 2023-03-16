@@ -6,12 +6,7 @@ import {
   BadRequestException,
   Body,
 } from '@nestjs/common';
-import {
-  ApiOkResponse,
-  ApiResponse,
-  ApiTags,
-  getSchemaPath,
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ConstantStrings } from '../utils/constants/strings.constants';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -24,7 +19,7 @@ export class AuthController {
 
   @ApiTags('authenticaion')
   @UseGuards(LoginAuthGuard)
-  @Post('auth/login')
+  @Post('v1/auth/login')
   @ApiOkResponse({
     description: ConstantStrings.swaggerTaskDescription200Response,
     type: LoginResponseDto,

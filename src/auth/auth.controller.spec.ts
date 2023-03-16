@@ -24,7 +24,7 @@ describe('AuthController', () => {
   describe('Post :: /auth/login', () => {
     it('Should get a login sucefully passing correct credentials', async () => {
       const response = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/v1/auth/login')
         .send({
           username: UserMockData[0].username,
           password: UserMockData[0].password,
@@ -35,7 +35,7 @@ describe('AuthController', () => {
 
     it('Should not make a login with a wrong credentials', async () => {
       await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/v1/auth/login')
         .send({
           username: UserMockData[0].username,
           password: 'wrong-password',

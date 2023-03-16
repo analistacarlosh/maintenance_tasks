@@ -54,7 +54,7 @@ describe('TaskController', () => {
     describe('Post :: /task - create a task as a technician user', () => {
       it(`should return 401 as it is not authenticated`, async () => {
         await request(app.getHttpServer())
-          .post('/task')
+          .post('/v1/task')
           .send(taskMock)
           .expect(401)
           .expect('Content-Type', /json/);
@@ -66,7 +66,7 @@ describe('TaskController', () => {
           .mockImplementation(() => technicianUserRequestMockData);
 
         await request(app.getHttpServer())
-          .post('/task')
+          .post('/v1/task')
           .set('Authorization', `Bearer ${technicianToken}`)
           .expect(400);
 
@@ -93,7 +93,7 @@ describe('TaskController', () => {
         );
 
         await request(app.getHttpServer())
-          .post('/task')
+          .post('/v1/task')
           .send(taskMock)
           .set('Authorization', `Bearer ${technicianToken}`)
           .expect(201)
@@ -115,7 +115,7 @@ describe('TaskController', () => {
     describe('Post :: /task - create a task as a manager user', () => {
       it(`should return 401 as it is not authenticated`, async () => {
         await request(app.getHttpServer())
-          .post('/task')
+          .post('/v1/task')
           .send(taskMock)
           .expect(401)
           .expect('Content-Type', /json/);
@@ -127,7 +127,7 @@ describe('TaskController', () => {
           .mockImplementation(() => managerUserRequestMockData);
 
         await request(app.getHttpServer())
-          .post('/task')
+          .post('/v1/task')
           .set('Authorization', `Bearer ${technicianToken}`)
           .expect(400);
 
@@ -154,7 +154,7 @@ describe('TaskController', () => {
         );
 
         await request(app.getHttpServer())
-          .post('/task')
+          .post('/v1/task')
           .send(taskMock)
           .set('Authorization', `Bearer ${managerToken}`)
           .expect(201)
@@ -178,7 +178,7 @@ describe('TaskController', () => {
     describe('/task as a technician user', () => {
       it(`should return 401 as it is not authenticated`, async () => {
         await request(app.getHttpServer())
-          .get('/task')
+          .get('/v1/task')
           .expect(401)
           .expect('Content-Type', /json/);
       });
@@ -199,7 +199,7 @@ describe('TaskController', () => {
         );
 
         await request(app.getHttpServer())
-          .get('/task')
+          .get('/v1/task')
           .set('Authorization', `Bearer ${technicianToken}`)
           .expect(200)
           .expect('Content-Type', /json/)
@@ -216,7 +216,7 @@ describe('TaskController', () => {
     describe('/task as a manager user', () => {
       it(`should return 401 as it is not authenticated`, async () => {
         request(app.getHttpServer())
-          .get('/task')
+          .get('/v1/task')
           .expect(401)
           .expect('Content-Type', /json/);
       });
@@ -237,7 +237,7 @@ describe('TaskController', () => {
         );
 
         await request(app.getHttpServer())
-          .get('/task')
+          .get('/v1/task')
           .set('Authorization', `Bearer ${managerToken}`)
           .expect(200)
           .expect('Content-Type', /json/)
