@@ -3,8 +3,8 @@ import { Task } from '../../task/entity/task.entity';
 import { User } from '../../user/entity/user.entity';
 import { UserRole } from '../../user/userRole.enum';
 
-const managerUserMockData = {
-  id: 10,
+export const ManagerUserMockData = {
+  id: 1,
   username: 'manager.test',
   password: '123456',
   role: UserRole.manager,
@@ -14,8 +14,8 @@ const managerUserMockData = {
   deletedAt: null,
 };
 
-const technicianUserMockData = {
-  id: 11,
+export const TechnicianUserMockData = {
+  id: 2,
   username: 'technician.test1',
   password: '654321',
   role: UserRole.technician,
@@ -26,10 +26,10 @@ const technicianUserMockData = {
 };
 
 export const UserMockData = [
-  managerUserMockData,
-  technicianUserMockData,
+  ManagerUserMockData,
+  TechnicianUserMockData,
   {
-    id: 12,
+    id: 3,
     username: 'technician.test2',
     password: '123456',
     role: UserRole.technician,
