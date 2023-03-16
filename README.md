@@ -1,7 +1,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+
 
 ## Installation
 
@@ -48,15 +48,15 @@ username: technician.test2
 password: 123456
 
 ## To test the Api, access Swagger APi documentation
-# http://localhost:${API_PORT}/docs
+*[http://localhost:${API_PORT}/docs](http://localhost:${API_PORT}/docs)*
 
 - Do the authenticaion first
 - copy and paste the token in the Authorize button to use the other two endpoints.
 
 ## To run the node Api locally, not in the Docker container
-- Consider to change the phost to
-TYPEORM_HOST=localhost
-RABBITMQ_HOST=amqp://localhost:5672
+Consider to change the ports to:
+- TYPEORM_HOST=localhost
+- RABBITMQ_HOST=amqp://localhost:5672
 
 ```bash
 $ npm install
@@ -71,15 +71,17 @@ $ npm run start:dev
 
 ```
 
-## Run the tests locally
+## Run the tests
 
 ```bash
 # unit tests
-$ npm run test
+$ docker-compose exec api npm run test
 
 # test coverage
-$ npm run test:cov
+$ docker-compose exec api npm run test:cov
 ```
+
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## License
 
